@@ -11,7 +11,7 @@ exports.create = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
         const document = await contactService.create(req.body);
-        return res.send(document);
+        return res.send(document);        
     } catch (error) {
         return next(
             new ApiError(500, "An error occurred while creating the contact")
@@ -19,13 +19,13 @@ exports.create = async (req, res, next) => {
     }
 };
 
-//Retrieve all contacts of a user from the database
+// Retrieve  all contacts of a user from the database
 exports.findAll = async (req, res, next) => {
     let documents = [];
 
     try {
         const contactService = new ContactService(MongoDB.client);
-        const { name } = req.query;
+        const {name} = req.query;
         if (name) {
             documents = await contactService.findByName(name);
         } else {
@@ -33,28 +33,30 @@ exports.findAll = async (req, res, next) => {
         }
     } catch (error) {
         return next(
-            new ApiError(500, "An error occurred while retrieving contacts")
+            new ApiError(500, "An error occurred while creating the contact")
         );
     }
 
-    return res.send(document);
+    return res.send(documents);
 };
 
-//Find a single contact with an id
+// Find a single contact with an id
 exports.findOne = async (req, res, next) => {
+    let documents = [];
     try {
         const contactService = new ContactService(MongoDB.client);
         const document = await contactService.findById(req.params.id);
         if (!document) {
             return next(new ApiError(404, "Contact not found"));
-        }
+        } 
         return res.send(document);
     } catch (error) {
         return next(
-            new ApiError(500, `Error retrieving contact with id=${req.params.id}`)
+            new ApiError(500,`Error retrieving contact with id=${req.params.id}`)
         );
     }
 };
+
 // Update a contact by the id in the request
 exports.update = async (req, res, next) => {
     if (Object.keys(req.body).length === 0) {
@@ -66,14 +68,15 @@ exports.update = async (req, res, next) => {
         const document = await contactService.update(req.params.id, req.body);
         if (!document) {
             return next(new ApiError(404, "Contact not found"));
-        }
-        return res.send({ message: "Contact was update successfully" });
+        } 
+        return res.send({message: "Contact was updated successfully" });
     } catch (error) {
         return next(
-            new ApiError(500, `Error updating contact with id=${req.params.id}`)
-        )
+            new ApiError(500,`Error updating contact with id=${req.params.id}`)
+        );
     }
 };
+
 // Delete a contact with the specified id in the request
 exports.delete = async (req, res, next) => {
     try {
@@ -81,34 +84,39 @@ exports.delete = async (req, res, next) => {
         const document = await contactService.delete(req.params.id);
         if (!document) {
             return next(new ApiError(404, "Contact not found"));
-        }
+        } 
         return res.send({ message: "Contact was deleted successfully" });
     } catch (error) {
         return next(
-            new ApiError(500, `Could not delete contact with id=${req.params.id}`)
+            new ApiError(500,`Could not delete contact with id=${req.params.id}`)
         );
     }
 };
 
-// Fin all favorite contacts of a user
+// Find all favorite contacts of a user
 exports.findAllFavorite = async (req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
-        const document = await contactService.findAllFavorite();
-        return res.send(document);
+        const documents = await contactService.findFavorite();
+        return res.send(documents);
     } catch (error) {
-        return next(new ApiError(500, `An error occurred while retrieving favorite contacts`));
+        return next(
+            new ApiError(500,"An error occurred while retrieving favorite contacts")
+        );
     }
 };
-// Delete all contacts of a user from the database
+// Delete all contacts of a user from the dâtbase
 exports.deleteAll = async (_req, res, next) => {
     try {
         const contactService = new ContactService(MongoDB.client);
-        const deleteCount = await contactService.deleteAll();
+        const deletedCount = await contactService.deleteAll();
         return res.send({
-            message: `${deleteCount} contacts were deleted successfully`,
+            message: `${deletedCount} contacts were deleted successfully`,
         });
     } catch (error) {
-        return next(new ApiError(500, "An error occurred while removing all contacts"));
+        console.log(error);
+        return next(
+            new ApiError(500, "An error occurred while removing all contacts")
+        );
     }
 };
